@@ -59,8 +59,8 @@ main (int argc, char *argv[])
   uint32_t udpPacketSizeUll = 100;
   uint32_t udpPacketSizeBe = 1252;
   uint32_t lambdaUll = 10000;
-  //uint32_t lambdaBe = 1000;
-  uint32_t lambdaBe = 100000;
+  uint32_t lambdaBe = 1000;
+  //uint32_t lambdaBe = 100000;
   bool singleBwp = false;
   std::string simTag = "default";
   std::string outputDir = "./";
@@ -147,10 +147,10 @@ main (int argc, char *argv[])
                 "Enable logging",
                 logging);
 
-
+  
   cmd.Parse (argc, argv);
-  NS_ABORT_IF (frequencyBwp1 < 6e9 || frequencyBwp1 > 100e9);
-  NS_ABORT_IF (frequencyBwp2 < 6e9 || frequencyBwp2 > 100e9);
+  //NS_ABORT_IF (frequencyBwp1 < 6e9 || frequencyBwp1 > 100e9);
+  //NS_ABORT_IF (frequencyBwp2 < 6e9 || frequencyBwp2 > 100e9);
 
   //ConfigStore inputConfig;
   //inputConfig.ConfigureDefaults ();
@@ -166,6 +166,7 @@ main (int argc, char *argv[])
       LogComponentEnable ("LtePdcp", LOG_LEVEL_INFO);
     }
 
+  // Channel
   Config::SetDefault ("ns3::MmWave3gppPropagationLossModel::ChannelCondition",
                       StringValue("l"));
   Config::SetDefault ("ns3::MmWave3gppPropagationLossModel::Scenario",
@@ -188,7 +189,7 @@ main (int argc, char *argv[])
   //Config::SetDefault("ns3::MmWaveEnbNetDevice::AntennaNum", UintegerValue (16));
   //Config::SetDefault("ns3::MmWaveEnbPhy::TxPower", DoubleValue (txPower));
 
-
+  // How many different bwps
   if(singleBwp)
     {
       Config::SetDefault ("ns3::MmWaveHelper::NumberOfComponentCarriers", UintegerValue (1));
@@ -255,6 +256,7 @@ main (int argc, char *argv[])
         }
     }
 
+  // Static Position of user devices
   mobility.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
   mobility.SetPositionAllocator (apPositionAlloc);
   mobility.Install (gNbNodes);
@@ -271,6 +273,7 @@ main (int argc, char *argv[])
   phyMacCommonBwp1->SetCentreFrequency(frequencyBwp1);
   phyMacCommonBwp1->SetBandwidth (bandwidthBwp1);
   phyMacCommonBwp1->SetNumerology(numerologyBwp1);
+  // MAC Scheduling type (Round Robin)
   phyMacCommonBwp1->SetAttribute ("MacSchedulerType", TypeIdValue (MmWaveMacSchedulerTdmaRR::GetTypeId ()));
   phyMacCommonBwp1->SetCcId (0);
 
@@ -541,6 +544,8 @@ main (int argc, char *argv[])
   Ptr<UniformRandomVariable> xx = CreateObject<UniformRandomVariable> ();
   uint16_t random1 = xx->GetInteger (1,1000000);
   outFile << "RandomNumber: " << std::to_string(random1) << "\n";
+
+  monitor->SerializeToXmlFile("FlowData.xml",true,true);
 
   outFile.close ();
 
